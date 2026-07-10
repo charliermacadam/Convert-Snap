@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ConvertSnap – Convert Images & Photos Instantly</title>
+  <meta name="description" content="Free online image converter. Convert JPG, PNG, WEBP, GIF, BMP, TIFF, AVIF, SVG, HEIC and more to any format – or export to PDF. No signup required." />
+  <meta name="keywords" content="image converter, photo converter, jpg to png, png to pdf, webp converter, heic converter, online image tool" />
+  <meta property="og:title" content="ConvertSnap – Free Online Image Converter" />
+  <meta property="og:description" content="Convert photos between any image format or to PDF, instantly in your browser." />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS ────────────────────────────────────────────── */
+    :root {
+      --bg:        #0F172A;
+      --surface:   #1E293B;
+      --surface2:  #293548;
+      --border:    #334155;
+      --teal:      #06B6D4;
+      --teal-dim:  #0891B2;
+      --amber:     #F59E0B;
+      --amber-dim: #D97706;
+      --red:       #F43F5E;
+      --green:     #10B981;
+      --text:      #F1F5F9;
+      --muted:     #94A3B8;
+      --faint:     #475569;
+      --radius:    12px;
+      --radius-sm: 6px;
+      --font-head: 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --ad-w:      160px;
+      --ad-gap:    20px;
+    }
+
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    a { color: var(--teal); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── LAYOUT SHELL ──────────────────────────────────────── */
+    /* Three-column: [ad] [main] [ad] */
+    #shell {
+      display: grid;
+      grid-template-columns: var(--ad-w) 1fr var(--ad-w);
+      grid-template-rows: auto 1fr auto;
+      grid-template-areas:
+        "header header header"
+        "ad-l   main   ad-r"
+        "footer footer footer";
+      min-height: 100vh;
+      column-gap: var(--ad-gap);
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────── */
+    header {
+      grid-area: header;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--teal); }
+    nav { display: flex; gap: 24px; font-size: 13px; color: var(--muted); }
+    nav a { color: var(--muted); transition: color .2s; }
+    nav a:hover { color: var(--text); text-decoration: none; }
+
+    /* ─── AD SLOTS ──────────────────────────────────────────── */
+    .ad-sidebar {
+      position: sticky;
+      top: 20px;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    #ad-left  { grid-area: ad-l; }
+    #ad-right { grid-area: ad-r; }
+
+    .ad-unit {
+      width: var(--ad-w);
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--faint);
+      font-size: 11px;
+      font-family: var(--font-head);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-align: center;
+      padding: 8px;
+      overflow: hidden;
+      /* Ad-network scripts inject content here */
+    }
+    .ad-unit--tall   { height: 600px; }
+    .ad-unit--medium { height: 250px; }
+    .ad-unit-label   { opacity: .45; font-size: 9px; margin-bottom: 4px; }
+
+    /* placeholder graphic inside ad boxes */
+    .ad-placeholder-icon {
+      font-size: 28px;
+      margin-bottom: 6px;
+      opacity: .3;
+    }
+
+    /* ─── MAIN CONTENT ──────────────────────────────────────── */
+    main { grid-area: main; padding: 40px 0 60px; }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    .hero { text-align: center; margin-bottom: 48px; }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: var(--font-head);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--teal);
+      background: rgba(6,182,212,.1);
+      border: 1px solid rgba(6,182,212,.25);
+      border-radius: 99px;
+      padding: 4px 14px;
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .hero h1 em { font-style: normal; color: var(--teal); }
+    .hero p {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 460px;
+      margin: 0 auto 28px;
+    }
+
+    /* format ticker animation */
+    .format-ticker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: var(--font-head);
+      font-size: .85rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .ticker-from, .ticker-to {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      min-width: 72px;
+      text-align: center;
+      transition: color .3s;
+    }
+    .ticker-arrow {
+      color: var(--teal);
+      font-size: 1.1rem;
+      animation: pulse-arrow 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse-arrow {
+      0%,100% { opacity: .5; transform: translateX(0); }
+      50%      { opacity: 1;  transform: translateX(3px); }
+    }
+
+    /* ─── TOOL CARD ─────────────────────────────────────────── */
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    /* drop zone */
+    .drop-zone {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 56px 32px;
+      cursor: pointer;
+      transition: background .2s, border-color .2s;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .drop-zone:hover,
+    .drop-zone.dragging { background: rgba(6,182,212,.06); }
+    .drop-zone.dragging { border-color: var(--teal); }
+    .drop-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .drop-icon {
+      width: 56px; height: 56px;
+      background: rgba(6,182,212,.12);
+      border: 1.5px solid rgba(6,182,212,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .drop-zone h2 {
+      font-family: var(--font-head);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .drop-zone p { font-size: .85rem; color: var(--muted); }
+    .drop-cta {
+      display: inline-block;
+      background: var(--teal);
+      color: #0F172A;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 9px 22px;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    .formats-supported {
+      font-size: .75rem;
+      color: var(--faint);
+      margin-top: 4px;
+    }
+
+    /* options bar */
+    .options-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .options-bar label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .options-bar select, .options-bar input[type=range] {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: .85rem;
+      font-family: var(--font-body);
+      outline: none;
+      cursor: pointer;
+    }
+    .options-bar select:focus { border-color: var(--teal); }
+    .opt-group { display: flex; align-items: center; gap: 8px; }
+    #quality-val {
+      font-family: var(--font-head);
+      font-size: .8rem;
+      color: var(--teal);
+      min-width: 34px;
+      text-align: right;
+    }
+
+    /* file list */
+    #file-list {
+      padding: 0;
+      list-style: none;
+    }
+    #file-list:empty + .convert-footer { display: none; }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: 48px 1fr auto auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+      animation: slide-in .2s ease;
+    }
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .file-item:hover { background: rgba(255,255,255,.02); }
+    .file-thumb {
+      width: 48px; height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .file-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .file-info { min-width: 0; }
+    .file-name {
+      font-size: .875rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+    .file-meta { font-size: .75rem; color: var(--muted); }
+    .file-status {
+      font-size: .75rem;
+      font-family: var(--font-head);
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+    .status-idle    { background: rgba(148,163,184,.1); color: var(--muted); }
+    .status-working { background: rgba(6,182,212,.12);  color: var(--teal); }
+    .status-done    { background: rgba(16,185,129,.12); color: var(--green); }
+    .status-error   { background: rgba(244,63,94,.12);  color: var(--red); }
+
+    .file-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 30px; height: 30px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      transition: background .15s, color .15s;
+    }
+    .btn-icon:hover { background: var(--surface2); color: var(--text); }
+    .btn-icon.download { border-color: rgba(6,182,212,.4); color: var(--teal); }
+    .btn-icon.download:hover { background: rgba(6,182,212,.15); }
+
+    /* progress bar per-file */
+    .file-progress {
+      grid-column: 1/-1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      display: none;
+    }
+    .file-progress-bar {
+      height: 100%;
+      background: var(--teal);
+      border-radius: 99px;
+      width: 0%;
+      transition: width .3s;
+    }
+
+    /* convert footer */
+    .convert-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 18px 24px;
+      background: var(--surface2);
+    }
+    .files-summary { font-size: .85rem; color: var(--muted); }
+    .files-summary strong { color: var(--text); }
+    .btn-group { display: flex; gap: 10px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .875rem;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      transition: background .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--amber); color: #0F172A; }
+    .btn-primary:hover { background: var(--amber-dim); }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-secondary:hover { background: var(--surface); color: var(--text); }
+    .btn-teal { background: var(--teal); color: #0F172A; }
+    .btn-teal:hover { background: var(--teal-dim); }
+
+    /* global download btn — shown after all done */
+    #download-all-wrap { display: none; padding: 0 24px 20px; }
+    #download-all-wrap.visible { display: block; }
+
+    /* ─── EMPTY STATE ───────────────────────────────────────── */
+    #empty-state {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--faint);
+      font-size: .85rem;
+    }
+
+    /* ─── FEATURE STRIP ─────────────────────────────────────── */
+    .features {
+      margin-top: 56px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+    }
+    .feat-icon { font-size: 28px; margin-bottom: 10px; }
+    .feat-card h3 {
+      font-family: var(--font-head);
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .feat-card p { font-size: .82rem; color: var(--muted); }
+
+    /* ─── FORMAT TABLE ──────────────────────────────────────── */
+    .format-section { margin-top: 48px; }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-size: .75rem;
+      margin-bottom: 16px;
+    }
+    .format-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-family: var(--font-head);
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: .04em;
+    }
+    .chip.out { border-color: rgba(6,182,212,.3); color: var(--teal); background: rgba(6,182,212,.07); }
+
+    /* ─── AD LEADERBOARD (top/bottom) ──────────────────────── */
+    .ad-leaderboard {
+      width: 100%;
+      height: 90px;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--faint);
+      font-size: 11px;
+      font-family: var(--font-head);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 24px 0 0;
+      /* Inject ad-network banner here (e.g. Google AdSense / Ezoic) */
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    footer {
+      grid-area: footer;
+      border-top: 1px solid var(--border);
+      padding: 24px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: .78rem;
+      color: var(--faint);
+    }
+    footer a { color: var(--faint); }
+    footer a:hover { color: var(--muted); }
+
+    /* ─── TOASTS ────────────────────────────────────────────── */
+    #toasts {
+      position: fixed; bottom: 24px; right: 24px;
+      display: flex; flex-direction: column-reverse; gap: 8px;
+      z-index: 9999;
+    }
+    .toast {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: .85rem;
+      color: var(--text);
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+      animation: toast-in .25s ease;
+      max-width: 300px;
+    }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .toast.success { border-color: rgba(16,185,129,.4); }
+    .toast.error   { border-color: rgba(244,63,94,.4); color: var(--red); }
+
+    /* ─── MODAL ─────────────────────────────────────────────── */
+    #modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      z-index: 9000; align-items: center; justify-content: center;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+    }
+    #modal h3 { font-family: var(--font-head); font-size: 1.1rem; margin-bottom: 10px; }
+    #modal p  { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+    #modal .btn { margin-top: 22px; }
+
+    /* ─── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 1199px) {
+      #shell {
+        grid-template-columns: 1fr;
+        grid-template-areas: "header" "main" "footer";
+      }
+      #ad-left, #ad-right { display: none; }
+      .ad-leaderboard { display: flex; }
+    }
+    @media (max-width: 700px) {
+      .features { grid-template-columns: 1fr; }
+      .options-bar { flex-direction: column; align-items: flex-start; }
+      header nav { display: none; }
+      .file-item { grid-template-columns: 40px 1fr auto; }
+      .file-item .file-status { display: none; }
+      .convert-footer { flex-direction: column; }
+    }
+
+    /* ─── SPINNER ───────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">Convert<span>Snap</span></div>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#formats">Formats</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </header>
+
+  <!-- ── LEFT AD SIDEBAR ── -->
+  <aside id="ad-left">
+    <div class="ad-sidebar">
+      <!-- AD SLOT 1 – 160×600 "Wide Skyscraper"
+           Replace this div with your ad-network tag.
+           Example for Google AdSense:
+             <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+                  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                  data-ad-slot="XXXXXXXXXX"></ins>
+             <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      -->
+      <div class="ad-unit ad-unit--tall" id="ad-slot-left-1">
+        <div class="ad-placeholder-icon">📢</div>
+        <div class="ad-unit-label">Advertisement</div>
+        160 × 600
+      </div>
+
+      <!-- AD SLOT 2 – 160×250 "Small Rectangle" -->
+      <div class="ad-unit ad-unit--medium" id="ad-slot-left-2">
+        <div class="ad-placeholder-icon">📢</div>
+        <div class="ad-unit-label">Advertisement</div>
+        160 × 250
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-eyebrow">✦ Free &amp; Instant – No Signup</div>
+      <h1>Convert <em>Any Photo</em><br>to Any Format</h1>
+      <p>Drag in your images. Pick an output format. Download in seconds. No file leaves your browser.</p>
+
+      <div class="format-ticker" id="ticker">
+        <span class="ticker-from" id="ticker-from">JPG</span>
+        <span class="ticker-arrow">→</span>
+        <span class="ticker-to"  id="ticker-to">PNG</span>
+      </div>
+    </section>
+
+    <!-- Leaderboard ad (shows on narrow screens where sidebars hide) -->
+    <!-- AD SLOT – 728×90 Leaderboard (or responsive)
+         Replace with your ad-network tag when deploying.
+    -->
+    <div class="ad-leaderboard" id="ad-slot-top">
+      Advertisement – 728 × 90
+    </div>
+
+    <!-- Tool card -->
+    <div class="tool-card" style="margin-top:28px">
+
+      <!-- Drop zone -->
+      <div class="drop-zone" id="drop-zone">
+        <input type="file" id="file-input" accept="image/*,.heic,.heif,.avif,.tif,.tiff,.bmp,.svg,.webp" multiple />
+        <div class="drop-icon">📁</div>
+        <h2>Drop images here to convert</h2>
+        <p>or click to browse your files</p>
+        <span class="drop-cta">Select Images</span>
+        <p class="formats-supported">JPG · PNG · WEBP · GIF · BMP · TIFF · AVIF · SVG · HEIC and more</p>
+      </div>
+
+      <!-- Options -->
+      <div class="options-bar">
+        <div class="opt-group">
+          <label for="output-format">Convert to:</label>
+          <select id="output-format">
+            <optgroup label="Raster Formats">
+              <option value="image/jpeg">JPG</option>
+              <option value="image/png" selected>PNG</option>
+              <option value="image/webp">WEBP</option>
+              <option value="image/gif">GIF</option>
+              <option value="image/bmp">BMP</option>
+            </optgroup>
+            <optgroup label="Document">
+              <option value="application/pdf">PDF</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="opt-group" id="quality-group">
+          <label for="quality-range">Quality:</label>
+          <input type="range" id="quality-range" min="10" max="100" value="92" step="1" />
+          <span id="quality-val">92%</span>
+        </div>
+
+        <div class="opt-group" id="pdf-opts" style="display:none">
+          <label for="pdf-size">PDF Page:</label>
+          <select id="pdf-size">
+            <option value="a4">A4</option>
+            <option value="letter">US Letter</option>
+            <option value="fit">Fit to image</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- File list -->
+      <ul id="file-list"></ul>
+      <div id="empty-state">No files added yet – drop some images above.</div>
+
+      <!-- Convert footer -->
+      <div class="convert-footer" id="convert-footer" style="display:none">
+        <span class="files-summary" id="files-summary"></span>
+        <div class="btn-group">
+          <button class="btn btn-secondary" id="clear-btn">✕ Clear all</button>
+          <button class="btn btn-primary"   id="convert-btn">⚡ Convert all</button>
+        </div>
+      </div>
+
+      <div id="download-all-wrap">
+        <button class="btn btn-teal" id="download-all-btn" style="width:100%">
+          ⬇ Download all as ZIP
+        </button>
+      </div>
+
+    </div><!-- /tool-card -->
+
+    <!-- Feature strip -->
+    <section class="features" id="how">
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
+        <h3>Private by design</h3>
+        <p>All conversion happens inside your browser using the Canvas API and PDF.js. Your photos are never uploaded to any server.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Batch in one click</h3>
+        <p>Add dozens of files at once. Convert them all to the same format with a single button — then download a ZIP.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📄</div>
+        <h3>Export to PDF</h3>
+        <p>Combine images into a single PDF, or export them as separate pages — choose A4, US Letter, or fit-to-image sizing.</p>
+      </div>
+    </section>
+
+    <!-- Format table -->
+    <section class="format-section" id="formats">
+      <p class="section-title">Supported Input Formats</p>
+      <div class="format-chips">
+        <span class="chip">JPG / JPEG</span>
+        <span class="chip">PNG</span>
+        <span class="chip">WEBP</span>
+        <span class="chip">GIF</span>
+        <span class="chip">BMP</span>
+        <span class="chip">TIFF / TIF</span>
+        <span class="chip">AVIF</span>
+        <span class="chip">SVG</span>
+        <span class="chip">HEIC / HEIF</span>
+        <span class="chip">ICO</span>
+        <span class="chip">PBM / PGM / PPM</span>
+      </div>
+      <p class="section-title" style="margin-top:22px">Output Formats</p>
+      <div class="format-chips">
+        <span class="chip out">JPG</span>
+        <span class="chip out">PNG</span>
+        <span class="chip out">WEBP</span>
+        <span class="chip out">GIF</span>
+        <span class="chip out">BMP</span>
+        <span class="chip out">PDF</span>
+      </div>
+    </section>
+
+    <!-- Bottom leaderboard -->
+    <div class="ad-leaderboard" id="ad-slot-bottom" style="margin-top:36px">
+      Advertisement – 728 × 90
+    </div>
+
+  </main>
+
+  <!-- ── RIGHT AD SIDEBAR ── -->
+  <aside id="ad-right">
+    <div class="ad-sidebar">
+      <!-- AD SLOT 3 – 160×600
+           Replace with your ad-network tag.
+      -->
+      <div class="ad-unit ad-unit--tall" id="ad-slot-right-1">
+        <div class="ad-placeholder-icon">📢</div>
+        <div class="ad-unit-label">Advertisement</div>
+        160 × 600
+      </div>
+
+      <!-- AD SLOT 4 – 160×250 -->
+      <div class="ad-unit ad-unit--medium" id="ad-slot-right-2">
+        <div class="ad-placeholder-icon">📢</div>
+        <div class="ad-unit-label">Advertisement</div>
+        160 × 250
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <span>© 2025 ConvertSnap · All conversions run locally in your browser</span>
+    <span>
+      <a href="privacy.html">Privacy Policy</a> ·
+      <a href="terms.html">Terms</a> ·
+      <a href="mailto:hello@convertsnap.app">Contact</a>
+    </span>
+  </footer>
+
+</div><!-- /shell -->
+
+<!-- Toast container -->
+<div id="toasts"></div>
+
+<!-- Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h3 id="modal-title">About PDF Export</h3>
+    <p id="modal-body"></p>
+    <button class="btn btn-teal" id="modal-close">Got it</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+     jsPDF is loaded from cdnjs for PDF generation.
+     All other conversion uses native browser Canvas API.
+════════════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── State ────────────────────────────────────────────────
+  const files = []; // { id, file, name, size, ext, status, result, url }
+  let nextId = 0;
+
+  // ── DOM refs ──────────────────────────────────────────────
+  const dropZone    = document.getElementById('drop-zone');
+  const fileInput   = document.getElementById('file-input');
+  const fileList    = document.getElementById('file-list');
+  const emptyState  = document.getElementById('empty-state');
+  const convertFoot = document.getElementById('convert-footer');
+  const summary     = document.getElementById('files-summary');
+  const clearBtn    = document.getElementById('clear-btn');
+  const convertBtn  = document.getElementById('convert-btn');
+  const dlAllWrap   = document.getElementById('download-all-wrap');
+  const dlAllBtn    = document.getElementById('download-all-btn');
+  const fmtSelect   = document.getElementById('output-format');
+  const qualRange   = document.getElementById('quality-range');
+  const qualVal     = document.getElementById('quality-val');
+  const qualGroup   = document.getElementById('quality-group');
+  const pdfOpts     = document.getElementById('pdf-opts');
+  const pdfSize     = document.getElementById('pdf-size');
+  const tickerFrom  = document.getElementById('ticker-from');
+  const tickerTo    = document.getElementById('ticker-to');
+
+  // ── Format ticker ─────────────────────────────────────────
+  const tickerPairs = [
+    ['JPG','PNG'],['PNG','PDF'],['HEIC','JPG'],['WEBP','PNG'],
+    ['TIFF','JPG'],['BMP','WEBP'],['GIF','PNG'],['SVG','PNG'],['JPG','PDF']
+  ];
+  let tickerIdx = 0;
+  setInterval(() => {
+    tickerIdx = (tickerIdx + 1) % tickerPairs.length;
+    tickerFrom.style.opacity = 0;
+    tickerTo.style.opacity   = 0;
+    setTimeout(() => {
+      tickerFrom.textContent = tickerPairs[tickerIdx][0];
+      tickerTo.textContent   = tickerPairs[tickerIdx][1];
+      tickerFrom.style.opacity = 1;
+      tickerTo.style.opacity   = 1;
+    }, 250);
+  }, 2000);
+  tickerFrom.style.transition = tickerTo.style.transition = 'opacity .25s';
+
+  // ── Quality / format controls ─────────────────────────────
+  qualRange.addEventListener('input', () => {
+    qualVal.textContent = qualRange.value + '%';
+  });
+
+  fmtSelect.addEventListener('change', () => {
+    const isPDF = fmtSelect.value === 'application/pdf';
+    pdfOpts.style.display   = isPDF ? 'flex' : 'none';
+    qualGroup.style.display = isPDF ? 'none' : 'flex';
+  });
+
+  // ── Drop zone ──────────────────────────────────────────────
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragging');
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+  function handleFiles(rawFiles) {
+    [...rawFiles].forEach(f => addFile(f));
+    fileInput.value = '';
+    syncUI();
+  }
+
+  function addFile(f) {
+    const id = nextId++;
+    const ext = (f.name.split('.').pop() || '').toUpperCase();
+    files.push({ id, file: f, name: f.name, size: f.size, ext, status: 'idle', result: null, url: null });
+    renderFile(files[files.length - 1]);
+  }
+
+  function renderFile(item) {
+    const li = document.createElement('li');
+    li.className = 'file-item';
+    li.id = 'fi-' + item.id;
+    li.innerHTML = `
+      <div class="file-thumb" id="thumb-${item.id}">
+        <span>🖼</span>
+      </div>
+      <div class="file-info">
+        <div class="file-name" title="${escHtml(item.name)}">${escHtml(item.name)}</div>
+        <div class="file-meta">${item.ext} · ${fmtSize(item.size)}</div>
+      </div>
+      <span class="file-status status-idle" id="status-${item.id}">Waiting</span>
+      <div class="file-actions">
+        <button class="btn-icon" title="Remove" onclick="removeFile(${item.id})">✕</button>
+        <button class="btn-icon download" id="dl-${item.id}" title="Download converted" style="display:none" onclick="downloadFile(${item.id})">⬇</button>
+      </div>
+      <div class="file-progress" id="prog-${item.id}"><div class="file-progress-bar" id="progbar-${item.id}"></div></div>
+    `;
+    fileList.appendChild(li);
+    // Generate thumbnail
+    if (item.file.type.startsWith('image/')) {
+      const fr = new FileReader();
+      fr.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        const th = document.getElementById('thumb-' + item.id);
+        if (th) { th.innerHTML = ''; th.appendChild(img); }
+      };
+      fr.readAsDataURL(item.file);
+    }
+  }
+
+  window.removeFile = function(id) {
+    const idx = files.findIndex(f => f.id === id);
+    if (idx === -1) return;
+    if (files[idx].url) URL.revokeObjectURL(files[idx].url);
+    files.splice(idx, 1);
+    const li = document.getElementById('fi-' + id);
+    if (li) li.remove();
+    syncUI();
+  };
+
+  window.downloadFile = function(id) {
+    const item = files.find(f => f.id === id);
+    if (!item || !item.url) return;
+    triggerDownload(item.url, item.outName);
+  };
+
+  function syncUI() {
+    const hasFiles = files.length > 0;
+    emptyState.style.display    = hasFiles ? 'none' : 'block';
+    convertFoot.style.display   = hasFiles ? 'flex' : 'none';
+    const doneCount = files.filter(f => f.status === 'done').length;
+    dlAllWrap.classList.toggle('visible', doneCount > 1);
+    summary.innerHTML = `<strong>${files.length}</strong> file${files.length !== 1 ? 's' : ''} — <strong>${doneCount}</strong> converted`;
+  }
+
+  // ── Convert ───────────────────────────────────────────────
+  convertBtn.addEventListener('click', async () => {
+    const pending = files.filter(f => f.status !== 'done');
+    if (!pending.length) { toast('All files already converted!', 'success'); return; }
+
+    const fmt     = fmtSelect.value;
+    const quality = parseInt(qualRange.value) / 100;
+    const isPDF   = fmt === 'application/pdf';
+
+    // Disable button
+    convertBtn.disabled = true;
+    convertBtn.innerHTML = '<span class="spinner"></span> Converting…';
+
+    if (isPDF) {
+      await convertToPDF(pending, quality);
+    } else {
+      for (const item of pending) {
+        await convertImage(item, fmt, quality);
+      }
+    }
+
+    convertBtn.disabled = false;
+    convertBtn.innerHTML = '⚡ Convert all';
+    syncUI();
+  });
+
+  async function convertImage(item, mime, quality) {
+    setStatus(item, 'working');
+    showProgress(item, 10);
+
+    try {
+      const img = await loadImage(item.file);
+      showProgress(item, 50);
+
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.naturalWidth  || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext('2d');
+      // White background for JPG/BMP
+      if (mime === 'image/jpeg' || mime === 'image/bmp') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(img, 0, 0);
+      showProgress(item, 80);
+
+      const blob = await canvasToBlob(canvas, mime, quality);
+      showProgress(item, 100);
+
+      const ext = mimeToExt(mime);
+      const baseName = item.name.replace(/\.[^/.]+$/, '');
+      item.outName = baseName + '.' + ext;
+      item.url = URL.createObjectURL(blob);
+      item.status = 'done';
+      item.result = blob;
+
+      setStatus(item, 'done');
+      document.getElementById('dl-' + item.id).style.display = 'flex';
+      toast(`Converted: ${item.outName}`, 'success');
+    } catch (err) {
+      console.error(err);
+      setStatus(item, 'error', 'Error');
+      toast(`Failed: ${item.name}`, 'error');
+    }
+  }
+
+  async function convertToPDF(items, quality) {
+    const { jsPDF } = window.jspdf;
+    const pageSizeOpt = pdfSize.value; // 'a4' | 'letter' | 'fit'
+
+    // Multi-file: merge into one PDF with each image on its own page
+    if (items.length === 1) {
+      await singleImageToPDF(items[0], jsPDF, pageSizeOpt, quality);
+    } else {
+      await multiImageToPDF(items, jsPDF, pageSizeOpt, quality);
+    }
+  }
+
+  async function singleImageToPDF(item, jsPDF, pageSizeOpt, quality) {
+    setStatus(item, 'working');
+    showProgress(item, 20);
+    try {
+      const img = await loadImage(item.file);
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+      const dataUrl = imageToDataUrl(img, w, h, 'image/jpeg', quality);
+      showProgress(item, 70);
+      const pdf = buildPDFPage(jsPDF, dataUrl, w, h, pageSizeOpt);
+      const blob = pdf.output('blob');
+      const baseName = item.name.replace(/\.[^/.]+$/, '');
+      item.outName = baseName + '.pdf';
+      item.url = URL.createObjectURL(blob);
+      item.status = 'done';
+      item.result = blob;
+      setStatus(item, 'done');
+      document.getElementById('dl-' + item.id).style.display = 'flex';
+      showProgress(item, 100);
+      toast(`PDF created: ${item.outName}`, 'success');
+    } catch (err) {
+      console.error(err);
+      setStatus(item, 'error', 'Error');
+      toast(`Failed: ${item.name}`, 'error');
+    }
+  }
+
+  async function multiImageToPDF(items, jsPDF, pageSizeOpt, quality) {
+    // Determine first page dimensions
+    const firstImg = await loadImage(items[0].file);
+    const fW = firstImg.naturalWidth || firstImg.width;
+    const fH = firstImg.naturalHeight || firstImg.height;
+    const [pdfW, pdfH] = getPDFDims(pageSizeOpt, fW, fH);
+
+    const pdf = new jsPDF({ unit: 'pt', format: [pdfW, pdfH], compress: true });
+    let first = true;
+
+    for (const item of items) {
+      setStatus(item, 'working');
+      showProgress(item, 20);
+      try {
+        const img = await loadImage(item.file);
+        const iW = img.naturalWidth || img.width;
+        const iH = img.naturalHeight || img.height;
+        const dataUrl = imageToDataUrl(img, iW, iH, 'image/jpeg', quality);
+
+        if (!first) {
+          const [pgW, pgH] = getPDFDims(pageSizeOpt, iW, iH);
+          pdf.addPage([pgW, pgH]);
+        }
+        first = false;
+
+        const [pgW, pgH] = getPDFDims(pageSizeOpt, iW, iH);
+        const { x, y, w, h } = fitImage(iW, iH, pgW, pgH);
+        pdf.addImage(dataUrl, 'JPEG', x, y, w, h, undefined, 'FAST');
+        showProgress(item, 90);
+        setStatus(item, 'done');
+        document.getElementById('dl-' + item.id).style.display = 'none'; // shared PDF
+        showProgress(item, 100);
+      } catch (err) {
+        console.error(err);
+        setStatus(item, 'error', 'Error');
+      }
+    }
+
+    const blob = pdf.output('blob');
+    const url  = URL.createObjectURL(blob);
+    // Attach merged PDF to first successful item for download
+    const first_done = items.find(i => i.status === 'done');
+    if (first_done) {
+      first_done.outName = 'converted-images.pdf';
+      first_done.url     = url;
+      first_done.result  = blob;
+      document.getElementById('dl-' + first_done.id).style.display = 'flex';
+    }
+    toast('Merged PDF ready — click ⬇ on any row to download', 'success');
+  }
+
+  function buildPDFPage(jsPDF, dataUrl, iW, iH, pageSizeOpt) {
+    const [pgW, pgH] = getPDFDims(pageSizeOpt, iW, iH);
+    const pdf = new jsPDF({ unit: 'pt', format: [pgW, pgH], compress: true });
+    const { x, y, w, h } = fitImage(iW, iH, pgW, pgH);
+    pdf.addImage(dataUrl, 'JPEG', x, y, w, h, undefined, 'FAST');
+    return pdf;
+  }
+
+  function getPDFDims(opt, iW, iH) {
+    if (opt === 'fit') return [iW * 0.75, iH * 0.75]; // px→pt approx
+    if (opt === 'a4')  return [595, 842];              // A4 in pt
+    return [612, 792];                                  // US Letter in pt
+  }
+
+  function fitImage(iW, iH, pgW, pgH) {
+    const margin = 20;
+    const maxW   = pgW - margin * 2;
+    const maxH   = pgH - margin * 2;
+    const ratio  = Math.min(maxW / iW, maxH / iH);
+    const w = iW * ratio;
+    const h = iH * ratio;
+    return { x: (pgW - w) / 2, y: (pgH - h) / 2, w, h };
+  }
+
+  function imageToDataUrl(img, w, h, mime, quality) {
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(img, 0, 0);
+    return c.toDataURL(mime, quality);
+  }
+
+  // ── Download all as ZIP ───────────────────────────────────
+  dlAllBtn.addEventListener('click', async () => {
+    const done = files.filter(f => f.status === 'done' && f.result);
+    if (!done.length) return;
+    dlAllBtn.disabled = true;
+    dlAllBtn.innerHTML = '<span class="spinner"></span> Building ZIP…';
+    try {
+      const zip = await buildZip(done);
+      const url = URL.createObjectURL(zip);
+      triggerDownload(url, 'convertsnap-output.zip');
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch(e) {
+      toast('ZIP failed: ' + e.message, 'error');
+    }
+    dlAllBtn.disabled = false;
+    dlAllBtn.innerHTML = '⬇ Download all as ZIP';
+  });
+
+  async function buildZip(items) {
+    // Minimal ZIP builder (no external lib needed)
+    // Uses CompressionStream if available, else stores uncompressed
+    const entries = [];
+    for (const item of items) {
+      const arr = await item.result.arrayBuffer();
+      entries.push({ name: item.outName, data: new Uint8Array(arr) });
+    }
+    return createZipBlob(entries);
+  }
+
+  function createZipBlob(entries) {
+    // Minimal ZIP64-safe builder (store method)
+    const enc   = new TextEncoder();
+    const parts = [];
+    const cdirs = [];
+    let offset  = 0;
+
+    entries.forEach(({ name, data }) => {
+      const nameBytes = enc.encode(name);
+      const crc       = crc32(data);
+      const local     = localFileHeader(nameBytes, data, crc);
+      const cd        = centralDirEntry(nameBytes, data, crc, offset);
+      parts.push(local, data);
+      cdirs.push(cd);
+      offset += local.length + data.length;
+    });
+
+    const cdData    = concat(cdirs);
+    const eocd      = endOfCentral(entries.length, cdData.length, offset);
+    return new Blob([concat(parts), cdData, eocd], { type: 'application/zip' });
+  }
+
+  function localFileHeader(nameBytes, data, crc) {
+    const h = new DataView(new ArrayBuffer(30 + nameBytes.length));
+    h.setUint32(0, 0x04034b50, true);
+    h.setUint16(4, 20, true);
+    h.setUint32(14, crc, true);
+    h.setUint32(18, data.length, true);
+    h.setUint32(22, data.length, true);
+    h.setUint16(26, nameBytes.length, true);
+    new Uint8Array(h.buffer).set(nameBytes, 30);
+    return new Uint8Array(h.buffer);
+  }
+
+  function centralDirEntry(nameBytes, data, crc, offset) {
+    const h = new DataView(new ArrayBuffer(46 + nameBytes.length));
+    h.setUint32(0, 0x02014b50, true);
+    h.setUint16(4, 20, true); h.setUint16(6, 20, true);
+    h.setUint32(16, crc, true);
+    h.setUint32(20, data.length, true);
+    h.setUint32(24, data.length, true);
+    h.setUint16(28, nameBytes.length, true);
+    h.setUint32(42, offset, true);
+    new Uint8Array(h.buffer).set(nameBytes, 46);
+    return new Uint8Array(h.buffer);
+  }
+
+  function endOfCentral(count, cdSize, cdOffset) {
+    const h = new DataView(new ArrayBuffer(22));
+    h.setUint32(0, 0x06054b50, true);
+    h.setUint16(8,  count,    true);
+    h.setUint16(10, count,    true);
+    h.setUint32(12, cdSize,   true);
+    h.setUint32(16, cdOffset, true);
+    return new Uint8Array(h.buffer);
+  }
+
+  function concat(arrays) {
+    const total = arrays.reduce((s, a) => s + a.length, 0);
+    const out = new Uint8Array(total);
+    let off = 0;
+    arrays.forEach(a => { out.set(a, off); off += a.length; });
+    return out;
+  }
+
+  function crc32(data) {
+    const table = crc32.table || (crc32.table = (() => {
+      const t = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) c = (c & 1) ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+        t[i] = c;
+      }
+      return t;
+    })());
+    let crc = 0xFFFFFFFF;
+    for (let i = 0; i < data.length; i++) crc = table[(crc ^ data[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  function loadImage(file) {
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload  = () => { URL.revokeObjectURL(url); res(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Image load failed')); };
+      img.src = url;
+    });
+  }
+
+  function canvasToBlob(canvas, mime, quality) {
+    return new Promise((res, rej) => {
+      canvas.toBlob(b => b ? res(b) : rej(new Error('Canvas toBlob failed')), mime, quality);
+    });
+  }
+
+  function mimeToExt(mime) {
+    return { 'image/jpeg':'jpg','image/png':'png','image/webp':'webp',
+             'image/gif':'gif','image/bmp':'bmp','application/pdf':'pdf' }[mime] || 'bin';
+  }
+
+  function fmtSize(bytes) {
+    if (bytes < 1024)       return bytes + ' B';
+    if (bytes < 1048576)    return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(2) + ' MB';
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setStatus(item, state, label) {
+    item.status = state;
+    const el = document.getElementById('status-' + item.id);
+    if (!el) return;
+    const labels  = { idle:'Waiting', working:'Converting…', done:'Done ✓', error:'Error ✗' };
+    el.textContent = label || labels[state] || state;
+    el.className   = 'file-status status-' + state;
+  }
+
+  function showProgress(item, pct) {
+    const pg = document.getElementById('prog-' + item.id);
+    const pb = document.getElementById('progbar-' + item.id);
+    if (!pg || !pb) return;
+    pg.style.display = pct < 100 ? 'block' : 'none';
+    pb.style.width   = pct + '%';
+  }
+
+  function triggerDownload(url, filename) {
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+  }
+
+  function toast(msg, type = '') {
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    document.getElementById('toasts').appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // ── Clear all ─────────────────────────────────────────────
+  clearBtn.addEventListener('click', () => {
+    files.forEach(f => { if (f.url) URL.revokeObjectURL(f.url); });
+    files.length = 0;
+    fileList.innerHTML = '';
+    dlAllWrap.classList.remove('visible');
+    syncUI();
+  });
+
+  // ── Modal ─────────────────────────────────────────────────
+  document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('modal-overlay').classList.remove('open');
+  });
+
+  // Initial state
+  syncUI();
+
+})();
+</script>
+
+</body>
+</html>
